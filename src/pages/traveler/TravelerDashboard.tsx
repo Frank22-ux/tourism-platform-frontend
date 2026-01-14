@@ -3,6 +3,23 @@ import api from '../../api/axios';
 import { toast } from 'react-toastify';
 import './TravelerDashboard.css';
 
+// --- IMPORTS PARA EL MAPA (LEAFLET) ---
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix para iconos de Leaflet
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
 const TravelerDashboard = ({ user, logout }: any) => {
   const [tours, setTours] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -231,10 +248,11 @@ const TravelerDashboard = ({ user, logout }: any) => {
                           <div style={{ height: '180px', position: 'relative', background: '#2a1b22' }}>
                             
                             {/* Etiqueta de Categoría */}
-                            <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 10 }}>
+                            <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 10, display: 'flex', gap: '5px' }}>
                               <span className="badge" style={{ background: isSoldOut ? 'var(--danger)' : 'var(--accent)', color: 'white', fontSize: '0.7rem', padding: '4px 8px', borderRadius: '4px' }}>
                                 {isSoldOut ? 'AGOTADO' : (tour.category || 'Sin Categoría')}
                               </span>
+                              {tour.isAdultOnly && <span className="badge" style={{ background: '#b91c1c', color: 'white', fontSize: '0.7rem', padding: '4px 8px', borderRadius: '4px' }}>+18</span>}
                             </div>
 
                             {tour.images && tour.images.length > 0 ? (
@@ -293,11 +311,11 @@ const TravelerDashboard = ({ user, logout }: any) => {
 
               <div className="glass" style={{ padding: '0', overflow: 'hidden' }}>
                 {bookings.length === 0 ? (
-                   <div style={{ textAlign: 'center', padding: '60px' }}>
-                     <div style={{ fontSize: '3rem', marginBottom: '15px' }}>📭</div>
-                     <h3>No tienes reservas activas</h3>
-                     <button onClick={() => setActiveTab('explore')} className="btn btn-secondary" style={{ marginTop: '20px', width: 'auto' }}>Ir al Catálogo</button>
-                   </div>
+                  <div style={{ textAlign: 'center', padding: '60px' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '15px' }}>📭</div>
+                    <h3>No tienes reservas activas</h3>
+                    <button onClick={() => setActiveTab('explore')} className="btn btn-secondary" style={{ marginTop: '20px', width: 'auto' }}>Ir al Catálogo</button>
+                  </div>
                 ) : (
                   <div className="bookings-table-container">
                     <table style={{ width: '100%' }}>
@@ -348,32 +366,102 @@ const TravelerDashboard = ({ user, logout }: any) => {
         </main>
       </div>
 
-      {/* MODAL DETALLES */}
+      {/* --- MODAL DETALLES MEJORADO (VIAJERO) --- */}
       {selectedTour && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }} onClick={() => setSelectedTour(null)}>
-          <div className="glass" style={{ width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', padding: '0', border: '1px solid var(--accent-2)' }} onClick={e => e.stopPropagation()}>
-            <div style={{ position: 'relative' }}>
-               <button onClick={() => setSelectedTour(null)} style={{ position: 'absolute', top: 15, right: 15, background: 'rgba(0,0,0,0.5)', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer', zIndex: 10, width: '32px', height: '32px', borderRadius: '50%' }}>✕</button>
-               {selectedTour.images?.[0] && <img src={`http://localhost:4000/uploads/${selectedTour.images[0]}`} style={{ width: '100%', height: '250px', objectFit: 'cover' }} />}
-            </div>
+          <div className="glass" style={{ width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '0', border: '1px solid var(--accent-2)' }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setSelectedTour(null)} style={{ position: 'absolute', top: 15, right: 15, background: 'rgba(0,0,0,0.5)', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer', zIndex: 10, width: '32px', height: '32px', borderRadius: '50%' }}>✕</button>
             
+            {/* Galería de Imágenes */}
+            <div style={{ height: '300px', background: '#000', display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory' }}>
+              {selectedTour.images?.length > 0 ? selectedTour.images.map((img: string, index: number) => (
+                <img key={index} src={`http://localhost:4000/uploads/${img}`} style={{ minWidth: '100%', height: '100%', objectFit: 'cover', scrollSnapAlign: 'center' }} />
+              )) : <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📸</div>}
+            </div>
+
             <div style={{ padding: '30px' }}>
-              <h2 className="title">{selectedTour.title}</h2>
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                 <span className="badge" style={{ background: 'var(--accent)' }}>{selectedTour.category || 'General'}</span>
-                 <span className="badge" style={{ background: 'rgba(255,255,255,0.1)' }}>{selectedTour.stock === -1 ? '∞ Ilimitado' : `Quedan: ${selectedTour.stock}`}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                <div>
+                  <h2 className="title" style={{ marginBottom: '5px' }}>{selectedTour.title}</h2>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <span className="badge" style={{ background: 'var(--accent)' }}>{selectedTour.category || 'General'}</span>
+                    <span className="badge" style={{ background: 'rgba(255,255,255,0.1)' }}>{selectedTour.stock === -1 ? '∞ Ilimitado' : `Quedan: ${selectedTour.stock}`}</span>
+                    {selectedTour.isAdultOnly && <span className="badge" style={{ background: 'var(--danger)' }}>+18 Adultos</span>}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                   <div style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--accent-2)' }}>${selectedTour.price}</div>
+                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>por persona</div>
+                </div>
               </div>
+
+              {/* Fechas */}
+              {selectedTour.startDate && (
+                  <div style={{ marginBottom: '20px', background: 'rgba(255,255,255,0.03)', padding: '10px 15px', borderRadius: '8px', display: 'inline-block' }}>
+                     📅 <b>Fechas:</b> {new Date(selectedTour.startDate).toLocaleDateString()} 
+                     {selectedTour.endDate ? ` - ${new Date(selectedTour.endDate).toLocaleDateString()}` : ' (Día único)'}
+                  </div>
+              )}
+
+              <p style={{ lineHeight: '1.8', color: 'var(--text-muted)', marginBottom: '30px' }}>{selectedTour.description}</p>
               
-              <p style={{ lineHeight: '1.6', color: 'var(--text-muted)', marginBottom: '30px' }}>{selectedTour.description}</p>
+              {/* Información de Hospedaje en Modal (COMPLETA) */}
+              {(selectedTour.hasLodging || selectedTour.lodgingDays) && (
+                 <div style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border-soft)', marginBottom: '25px' }}>
+                    <h4 style={{ color: 'var(--accent-2)', marginBottom: '15px', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>🏠 Detalles del Paquete</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '20px' }}>
+                       <div><span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', display: 'block' }}>Duración</span><div style={{ fontWeight: 'bold' }}>{selectedTour.lodgingDays || 0} Días / {selectedTour.lodgingNights || 0} Noches</div></div>
+                       
+                       {selectedTour.lodgingRooms > 0 && (
+                         <div><span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', display: 'block' }}>Habitaciones</span><div style={{ fontWeight: 'bold' }}>{selectedTour.lodgingRooms} Disp.</div></div>
+                       )}
+
+                       <div>
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', display: 'block' }}>Transporte</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold' }}>
+                            {selectedTour.hasTransport ? (
+                              <><span>🚌</span> {selectedTour.transportType === 'roundtrip' ? 'Ida y Vuelta' : selectedTour.transportType === 'pickup' ? 'Solo Ida' : 'Solo Retorno'}</>
+                            ) : <span style={{color:'gray'}}>No incluido</span>}
+                          </div>
+                       </div>
+
+                       <div>
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', display: 'block' }}>Alimentación</span>
+                          <div style={{ fontWeight: 'bold' }}>{selectedTour.hasFood ? '🍽️ Incluida' : <span style={{color:'gray'}}>No incluida</span>}</div>
+                       </div>
+                    </div>
+                 </div>
+              )}
+
+              {/* Mapa de Ubicación (Solo Visualización) */}
+              {selectedTour.location && (
+                 <div style={{ height: '200px', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-soft)', marginBottom: '20px' }}>
+                    <MapContainer 
+                        center={[selectedTour.location.coordinates[1], selectedTour.location.coordinates[0]]} 
+                        zoom={13} 
+                        style={{ height: '100%', width: '100%' }}
+                        dragging={false} 
+                        scrollWheelZoom={false}
+                        attributionControl={false}
+                        zoomControl={false}
+                    >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <Marker position={[selectedTour.location.coordinates[1], selectedTour.location.coordinates[0]]} />
+                    </MapContainer>
+                 </div>
+              )}
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
                 <div>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Precio total</div>
                   <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent-2)' }}>${selectedTour.price}</div>
                 </div>
-                <button className="btn btn-primary" style={{ width: 'auto', padding: '12px 30px' }} onClick={() => handleBook(selectedTour.id, selectedTour.title)}>
-                  Confirmar Reserva 🎟️
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                   <button className="btn btn-secondary" onClick={() => setSelectedTour(null)}>Cerrar</button>
+                   <button className="btn btn-primary" style={{ width: 'auto', padding: '12px 30px' }} onClick={() => handleBook(selectedTour.id, selectedTour.title)}>
+                     Confirmar Reserva 🎟️
+                   </button>
+                </div>
               </div>
             </div>
           </div>

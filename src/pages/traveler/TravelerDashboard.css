@@ -1,21 +1,30 @@
 /* ESTILOS ESPECÍFICOS DEL PANEL DE VIAJERO */
 
-/* El layout principal: En escritorio es Fila (Lado a lado) */
+/* Definición de Variables Locales (Paleta Profesional) */
 .traveler-layout {
+  --traveler-bg: #353535;       /* Fondo Principal: Gris Oscuro Elegante */
+  --traveler-sidebar: #284B63;  /* Sidebar: Azul Profundo */
+  --traveler-accent: #3C6E71;   /* Acento: Verde Azulado */
+  --traveler-text: #FFFFFF;     /* Texto Principal: Blanco */
+  --traveler-muted: #D9D9D9;    /* Texto Secundario: Gris Claro */
+  --traveler-border: rgba(255, 255, 255, 0.1); /* Bordes sutiles */
+  
   display: flex;
   min-height: 100vh;
   position: relative;
-  background-color: var(--bg-dark);
+  background-color: var(--traveler-bg);
   width: 100%;
   overflow-x: hidden; /* Evita scroll horizontal accidental */
+  color: var(--traveler-text);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 /* Sidebar: En escritorio es una columna fija a la izquierda */
 .traveler-sidebar {
   width: 280px;       /* Ancho fijo */
   min-width: 280px;   /* Evita que se aplaste */
-  background: rgba(32, 18, 25, 0.98); /* Fondo oscuro sólido (Vino oscuro) */
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--traveler-sidebar); /* Azul Profundo */
+  border-right: 1px solid var(--traveler-border);
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
@@ -23,6 +32,35 @@
   top: 0;
   height: 100vh;      /* Ocupa toda la altura */
   z-index: 50;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Ajustes de botones en Sidebar */
+.traveler-sidebar .nav-btn {
+  color: var(--traveler-muted);
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.traveler-sidebar .nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--traveler-text);
+  transform: translateX(4px);
+}
+
+.traveler-sidebar .nav-btn.active {
+  background: rgba(60, 110, 113, 0.4); /* Tinte del accent */
+  color: var(--traveler-text);
+  border-left: 4px solid var(--traveler-text); /* Borde blanco para destacar */
+  font-weight: 600;
+}
+
+/* Header del Sidebar */
+.traveler-sidebar .topbar-logo-circle {
+  background: linear-gradient(135deg, #3C6E71, #284B63) !important;
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 /* Contenedor de la tabla de reservas */
@@ -30,7 +68,23 @@
   overflow-x: auto;   /* Permite scroll en la tabla si es muy ancha */
   border-radius: 12px;
   margin-top: 20px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.2); /* Fondo oscuro sutil */
+  border: 1px solid var(--traveler-border);
+}
+
+/* Estilos de Tabla específicos */
+.bookings-table-container table th {
+  background: rgba(60, 110, 113, 0.2); /* Cabecera con tinte accent */
+  color: var(--traveler-text);
+  font-weight: 600;
+  padding: 12px;
+  text-align: left;
+}
+
+.bookings-table-container table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--traveler-border);
+  color: var(--traveler-muted);
 }
 
 /* --- NUEVOS ESTILOS: FILTROS DE CATEGORÍA --- */
@@ -50,9 +104,9 @@
 .category-chip {
   padding: 8px 18px;
   border-radius: 99px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--traveler-muted);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--traveler-muted);
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
@@ -60,17 +114,43 @@
 }
 
 .category-chip:hover {
-  border-color: var(--accent-2);
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--traveler-accent);
+  color: var(--traveler-text);
+  background: rgba(60, 110, 113, 0.1);
 }
 
 .category-chip.active {
-  background: var(--accent-2);
-  color: #1f2933; /* Texto oscuro para contraste con amarillo */
-  border-color: var(--accent-2);
+  background: var(--traveler-accent); /* Verde Azulado */
+  color: #FFFFFF; 
+  border-color: var(--traveler-accent);
   font-weight: 600;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.4);
+  box-shadow: 0 4px 10px rgba(60, 110, 113, 0.4);
+}
+
+/* Tarjetas Métricas (Tours) - Adaptación de colores */
+.metric-card {
+  background: #404040; /* Un gris ligeramente más claro que el fondo */
+  border: 1px solid var(--traveler-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  border-color: var(--traveler-accent);
+}
+
+/* Inputs de búsqueda */
+input[type="text"] {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--traveler-border) !important;
+  color: var(--traveler-text) !important;
+}
+
+input[type="text"]:focus {
+  border-color: var(--traveler-accent) !important;
 }
 
 /* =========================================
@@ -89,8 +169,8 @@
     height: auto;       /* Altura automática según contenido */
     position: relative; /* Deja de ser sticky */
     border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
+    border-bottom: 1px solid var(--traveler-border);
+    padding: 15px 20px;
     flex-direction: row; /* Opcional: Si quieres iconos al lado en móvil */
     flex-wrap: wrap;     /* Permite que los elementos bajen si no caben */
     justify-content: space-between;
@@ -105,9 +185,20 @@
     overflow-x: auto; /* Scroll horizontal si hay muchos botones */
     gap: 10px;
     padding-bottom: 10px;
+    margin-top: 10px;
   }
 
   .nav-btn {
     white-space: nowrap; /* Evita que el texto del botón se parta */
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  /* Ocultar el botón de cerrar sesión grande y mostrar uno compacto si es necesario */
+  .traveler-sidebar > div:last-child {
+      width: 100%;
+      border-top: 1px solid var(--traveler-border);
+      padding-top: 10px;
+      margin-top: 10px;
   }
 }
