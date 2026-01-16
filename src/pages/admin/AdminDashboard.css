@@ -1,0 +1,137 @@
+/* ESTILOS ESPECÍFICOS DEL PANEL DE ADMINISTRADOR */
+
+/* Definición de Paleta Local */
+.admin-layout {
+  --admin-bg: #353535;       /* Fondo Principal */
+  --admin-sidebar: #284B63;  /* Sidebar Azul Profundo */
+  --admin-accent: #3C6E71;   /* Acento Verde/Azulado */
+  --admin-text: #FFFFFF;     /* Texto Blanco */
+  --admin-muted: #D9D9D9;    /* Texto Secundario */
+  
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--admin-bg);
+  width: 100%;
+  overflow-x: hidden;
+  color: var(--admin-text);
+}
+
+/* Sidebar del Admin */
+.admin-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--admin-sidebar);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 50;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Ajustes de botones en Sidebar para que coincidan con la paleta */
+.admin-sidebar .nav-btn {
+  color: var(--admin-muted);
+}
+.admin-sidebar .nav-btn:hover, .admin-sidebar .nav-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--admin-text);
+  border-left: 4px solid var(--admin-accent);
+}
+
+/* Tarjetas de Métricas (KPIs) */
+.stat-card {
+  background: rgba(255, 255, 255, 0.03); /* Sutilmente más claro que el fondo */
+  border: 1px solid rgba(217, 217, 217, 0.1); /* D9D9D9 con transparencia */
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--admin-accent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  background: rgba(60, 110, 113, 0.2); /* Tinte del accent */
+  color: var(--admin-text);
+}
+
+/* Formulario de Creación */
+.admin-form-container {
+  background: rgba(40, 75, 99, 0.3); /* Tinte del sidebar */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.file-upload-area {
+  border: 2px dashed rgba(217, 217, 217, 0.3);
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.file-upload-area:hover {
+  border-color: var(--admin-accent);
+  background: rgba(60, 110, 113, 0.1);
+}
+
+/* Sobreescribir botones primarios dentro del layout de Admin */
+.admin-layout .btn-primary {
+  background: var(--admin-accent);
+  color: #FFFFFF;
+}
+.admin-layout .btn-primary:hover {
+  background: #2a5254; /* Un poco más oscuro que 3C6E71 */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(60, 110, 113, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+  
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .admin-sidebar nav {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 5px;
+  }
+}
